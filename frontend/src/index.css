@@ -1,0 +1,149 @@
+/* Google Fonts - Noto Serif SC (Display), Noto Sans SC (Body), JetBrains Mono (Code), Ma Shan Zheng (Logo) */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+/* @import './assets/ink-patterns.css'; Remove legacy patterns */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Reset */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans SC', system-ui, sans-serif;
+  /* UI Font - Deep Black */
+  background-color: #0A0A0A;
+  /* Text - High Contrast */
+  color: #EBEBEB;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  /* Remove ink texture, use pure color or subtle noise if needed */
+  background-color: #0A0A0A;
+}
+
+/* Ant Design Dark Mode Overrides (Black Gold Theme) */
+.ant-layout {
+  background: transparent !important;
+}
+
+.ant-layout-header {
+  background: rgba(10, 10, 10, 0.8) !important;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid #262626;
+  padding-inline: 24px;
+}
+
+.ant-layout-content {
+  color: #EBEBEB;
+}
+
+.ant-layout-footer {
+  background: #0A0A0A !important;
+  border-top: 1px solid #262626;
+  color: #525252 !important;
+}
+
+/* Menu Overrides */
+.ant-menu {
+  background: transparent !important;
+  border-bottom: none !important;
+  color: #A3A3A3 !important;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+}
+
+.ant-menu-item-selected {
+  color: #D4AF37 !important;
+  /* Gold */
+  background-color: rgba(212, 175, 55, 0.1) !important;
+}
+
+.ant-menu-item:hover {
+  color: #EBEBEB !important;
+}
+
+.ant-menu-item-selected::after {
+  border-bottom-color: #D4AF37 !important;
+}
+
+/* Pagination */
+.ant-pagination-item {
+  background: transparent !important;
+  border-color: #262626 !important;
+}
+
+.ant-pagination-item a {
+  color: #A3A3A3 !important;
+}
+
+.ant-pagination-item-active {
+  background: rgba(212, 175, 55, 0.1) !important;
+  border-color: #D4AF37 !important;
+}
+
+.ant-pagination-item-active a {
+  color: #D4AF37 !important;
+}
+
+/* Component Layers */
+@layer components {
+
+  /* Cards */
+  .app-card {
+    @apply bg-dark-paper border border-dark-border shadow-elevation-1 rounded-md p-6 relative overflow-hidden;
+  }
+
+  .app-card-lg {
+    @apply bg-dark-paper border border-dark-border shadow-elevation-1 rounded-lg p-8 relative overflow-hidden;
+  }
+
+  .app-card-hover {
+    @apply transition-all duration-300 hover:border-accent/40 hover:shadow-elevation-2 hover:-translate-y-0.5;
+  }
+
+  /* Buttons */
+  .app-button {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2 rounded-sm bg-action text-white font-body font-medium tracking-wide;
+    @apply hover:bg-action-hover hover:shadow-lg transition-all duration-300;
+  }
+
+  .app-button-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-2 rounded-sm border border-accent text-accent font-body font-medium tracking-wide;
+    @apply hover:bg-accent-dim transition-all duration-300;
+  }
+
+  /* Tags/Badges */
+  .tag-hot {
+    @apply inline-flex items-center px-1.5 py-0.5 rounded-sm text-xs font-bold bg-action/10 text-action border border-action/20;
+  }
+
+  .tag-status {
+    @apply inline-flex items-center px-1.5 py-0.5 rounded-sm text-xs font-medium bg-dark-hover text-text-secondary border border-dark-border;
+  }
+}
+
+@layer utilities {
+  .font-shan {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-weight: 400;
+  }
+}
+
+/* Profile Page Particle Animation */
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 0.6;
+  }
+}

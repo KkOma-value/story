@@ -1,0 +1,78 @@
+/* Ink Patterns & Effects */
+
+@layer utilities {
+  .bg-ink-texture {
+    background-color: #0D1117;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231F2937' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-attachment: fixed;
+  }
+
+  /* 墨迹流动效果 */
+  .ink-flow {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .ink-flow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(123, 104, 238, 0.1) 0%, transparent 60%);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  
+  .ink-flow:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* 烟雾缭绕 */
+  .animate-mist {
+    animation: mist 20s infinite linear;
+    background: url('https://raw.githubusercontent.com/kasperzeager/polychrome/master/assets/noise.png'); /* Fallback usage of noise texture */
+    opacity: 0.05;
+  }
+
+  @keyframes mist {
+    0% { background-position: 0 0; }
+    100% { background-position: 1000px 500px; }
+  }
+
+  /* 文字渐变流光 */
+  .text-mystic {
+    background: linear-gradient(to right, #E6EDF3 20%, #7B68EE 50%, #E6EDF3 80%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shine 5s linear infinite;
+  }
+
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0D1117;
+  border-left: 1px solid #30363D;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #30363D;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7B68EE;
+}

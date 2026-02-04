@@ -1,0 +1,90 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+ENV/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+*.pot
+local_settings.py
+staticfiles/
+media/
+
+# Node.js / Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+build/
+.next/
+out/
+.cache/
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Office files (Word, Excel)
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Claude / AI agent files
+.claude/
+.agent/
+.trae/
+.shared/
+.opencode/
+
+# Virtual environment folders
+.venv/
+venv/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Coverage / Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+
+# Misc
+*.pid
+*.seed
+*.pid.lock
+.npm
+.eslintcache

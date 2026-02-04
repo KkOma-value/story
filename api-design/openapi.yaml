@@ -1,0 +1,1448 @@
+openapi: 3.0.3
+info:
+  title: 小说推荐系统 API
+  version: 0.1.0
+  description: |
+    REST + JSON API 契约。
+    - Base Path: /api
+    - 统一响应包裹：success/message/data（文件下载接口例外）
+servers:
+  - url: /
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: Novels
+  - name: Interactions
+  - name: Recommendations
+  - name: Admin
+  - name: Analytics
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApiResponseBase:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          nullable: true
+      required: [success, message, data]
+
+    PaginatedList_Novel:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Novel'
+        total:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+      required: [items, total, page, pageSize]
+
+    PaginatedList_User:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        total:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+      required: [items, total, page, pageSize]
+
+    PaginatedList_CommentThread:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentThread'
+        total:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+      required: [items, total, page, pageSize]
+
+    PaginatedList_Comment:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        total:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+      required: [items, total, page, pageSize]
+
+    UserRole:
+      type: string
+      enum: [user, admin]
+
+    UserStatus:
+      type: string
+      enum: [active, banned, permanent_banned, deleted]
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+          description: 用户名可重复
+        displayName:
+          type: string
+        email:
+          type: string
+          format: email
+          description: 全局唯一。一个 email 只能注册一个账号。
+        avatarUrl:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        role:
+          $ref: '#/components/schemas/UserRole'
+        status:
+          $ref: '#/components/schemas/UserStatus'
+      required: [id, username, displayName, email, role, status]
+
+    Novel:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        author:
+          type: string
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        intro:
+          type: string
+        coverUrl:
+          type: string
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+        views:
+          type: integer
+          minimum: 0
+        favorites:
+          type: integer
+          minimum: 0
+      required: [id, title, author, category, tags, intro, updatedAt, views, favorites]
+
+    NovelDetail:
+      allOf:
+        - $ref: '#/components/schemas/Novel'
+        - type: object
+          properties:
+            myFavorite:
+              type: boolean
+              nullable: true
+            myRating:
+              type: integer
+              minimum: 1
+              maximum: 5
+              nullable: true
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        novelId:
+          type: string
+        userId:
+          type: string
+        userDisplayName:
+          type: string
+        content:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        deleted:
+          type: boolean
+      required: [id, novelId, userId, userDisplayName, content, parentId, createdAt, deleted]
+
+    CommentThread:
+      allOf:
+        - $ref: '#/components/schemas/Comment'
+        - type: object
+          properties:
+            replies:
+              type: array
+              items:
+                $ref: '#/components/schemas/Comment'
+              nullable: true
+
+    NovelAnalyticsRow:
+      type: object
+      properties:
+        novelId:
+          type: string
+        title:
+          type: string
+        views:
+          type: integer
+        favorites:
+          type: integer
+        ratingCount:
+          type: integer
+        avgRating:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 5
+      required: [novelId, title, views, favorites, ratingCount, avgRating]
+
+    UserAnalyticsRow:
+      type: object
+      properties:
+        userId:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: string
+        logins:
+          type: integer
+        searches:
+          type: integer
+        novelViews:
+          type: integer
+        favorites:
+          type: integer
+        ratings:
+          type: integer
+        comments:
+          type: integer
+      required: [userId, username, displayName, logins, searches, novelViews, favorites, ratings, comments]
+
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+          format: email
+          description: 全局唯一。一个 email 只能注册一个账号。
+        code:
+          type: string
+        password:
+          type: string
+        confirmPassword:
+          type: string
+      required: [username, displayName, email, code, password, confirmPassword]
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+
+    UpdateMeRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+        confirmPassword:
+          type: string
+      required: [oldPassword, newPassword, confirmPassword]
+
+    RatingRequest:
+      type: object
+      properties:
+        score:
+          type: integer
+          minimum: 1
+          maximum: 5
+      required: [score]
+
+    CreateCommentRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        parentId:
+          type: string
+          nullable: true
+      required: [content, parentId]
+
+    BanUserRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [banned, permanent_banned]
+        reason:
+          type: string
+          nullable: true
+        until:
+          type: string
+          format: date-time
+          nullable: true
+      required: [type]
+
+  responses:
+    ErrorResponse:
+      description: Error
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponseBase'
+
+paths:
+  /api/auth/email-code:
+    post:
+      tags: [Auth]
+      summary: 发送邮箱验证码
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                purpose:
+                  type: string
+                  enum: [register]
+              required: [email, purpose]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sent:
+                            type: boolean
+                        required: [sent]
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: 用户注册
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          userId:
+                            type: string
+                        required: [userId]
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: 用户登录（email + password）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                          user:
+                            $ref: '#/components/schemas/User'
+                        required: [token, user]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: 用户登出
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success:
+                            type: boolean
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/users/me:
+    get:
+      tags: [Users]
+      summary: 获取当前用户信息
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+    put:
+      tags: [Users]
+      summary: 修改当前用户信息
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMeRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/users/me/password:
+    put:
+      tags: [Users]
+      summary: 修改密码
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success:
+                            type: boolean
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/users/me/favorites:
+    get:
+      tags: [Users]
+      summary: 我的收藏列表
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PaginatedList_Novel'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/novels/search:
+    get:
+      tags: [Novels]
+      summary: 搜索小说（默认按热度）
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: title
+          schema: { type: string }
+        - in: query
+          name: author
+          schema: { type: string }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: sort
+          schema:
+            type: string
+            enum: [hot]
+            default: hot
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PaginatedList_Novel'
+
+  /api/novels/{novelId}:
+    get:
+      tags: [Novels]
+      summary: 查看小说详情
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/NovelDetail'
+        '404':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/novels/{novelId}/favorite:
+    post:
+      tags: [Interactions]
+      summary: 收藏小说
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+    delete:
+      tags: [Interactions]
+      summary: 取消收藏
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/novels/{novelId}/rating:
+    put:
+      tags: [Interactions]
+      summary: 评分（1-5，可覆盖更新）
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/novels/{novelId}/comments:
+    get:
+      tags: [Interactions]
+      summary: 获取小说评论（根评论分页）
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PaginatedList_CommentThread'
+    post:
+      tags: [Interactions]
+      summary: 发表评论/回复（楼中楼）
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          commentId: { type: string }
+                        required: [commentId]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/comments/{commentId}/replies:
+    get:
+      tags: [Interactions]
+      summary: 获取某条评论的回复分页
+      parameters:
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PaginatedList_Comment'
+
+  /api/comments/{commentId}:
+    delete:
+      tags: [Interactions]
+      summary: 删除自己的评论
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: commentId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/recommendations/personalized:
+    get:
+      tags: [Recommendations]
+      summary: 个性化推荐
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, default: 6 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Novel'
+
+  /api/recommendations/hot:
+    get:
+      tags: [Recommendations]
+      summary: 热门推荐（按收藏数）
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, default: 6 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Novel'
+
+  /api/recommendations/latest:
+    get:
+      tags: [Recommendations]
+      summary: 最新推荐
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, default: 6 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Novel'
+
+  /api/admin/novels:
+    get:
+      tags: [Admin]
+      summary: 管理端小说列表/筛选
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: keyword
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string, enum: [published, shelved, deleted] }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: author
+          schema: { type: string }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PaginatedList_Novel'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+    post:
+      tags: [Admin]
+      summary: 新增小说
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                author: { type: string }
+                category: { type: string }
+                tags:
+                  type: array
+                  items: { type: string }
+                intro: { type: string }
+                coverUrl: { type: string, nullable: true }
+              required: [title, author, category, tags, intro]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          novelId: { type: string }
+                        required: [novelId]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/novels/{novelId}:
+    put:
+      tags: [Admin]
+      summary: 编辑小说
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                author: { type: string }
+                category: { type: string }
+                tags:
+                  type: array
+                  items: { type: string }
+                intro: { type: string }
+                coverUrl: { type: string, nullable: true }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+    delete:
+      tags: [Admin]
+      summary: 删除小说（逻辑删除）
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/novels/{novelId}/status:
+    patch:
+      tags: [Admin]
+      summary: 下架/上架
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: novelId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [published, shelved]
+              required: [status]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/novels/export:
+    get:
+      tags: [Admin]
+      summary: 导出小说数据（xlsx，按筛选）
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: keyword
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string, enum: [published, shelved, deleted] }
+        - in: query
+          name: category
+          schema: { type: string }
+        - in: query
+          name: author
+          schema: { type: string }
+      responses:
+        '200':
+          description: XLSX binary
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/users:
+    get:
+      tags: [Admin]
+      summary: 管理端用户列表/查询
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: keyword
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string, enum: [active, banned, permanent_banned, deleted] }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PaginatedList_User'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/users/{userId}:
+    get:
+      tags: [Admin]
+      summary: 查看用户信息
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+    put:
+      tags: [Admin]
+      summary: 编辑用户信息
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: { type: string }
+                displayName: { type: string }
+                avatarUrl: { type: string, nullable: true }
+                bio: { type: string, nullable: true }
+                role:
+                  $ref: '#/components/schemas/UserRole'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      tags: [Admin]
+      summary: 删除用户（逻辑删除）
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/users/{userId}/ban:
+    post:
+      tags: [Admin]
+      summary: 封禁/永久封禁
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BanUserRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/users/{userId}/unban:
+    post:
+      tags: [Admin]
+      summary: 解封
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          success: { type: boolean }
+                        required: [success]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/analytics/novels:
+    get:
+      tags: [Analytics]
+      summary: 小说数据分析
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date }
+        - in: query
+          name: to
+          schema: { type: string, format: date }
+        - in: query
+          name: sort
+          schema: { type: string, enum: [hot], default: hot }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/NovelAnalyticsRow'
+                          total:
+                            type: integer
+                          page:
+                            type: integer
+                          pageSize:
+                            type: integer
+                        required: [items, total, page, pageSize]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/admin/analytics/users:
+    get:
+      tags: [Analytics]
+      summary: 用户行为分析
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date }
+        - in: query
+          name: to
+          schema: { type: string, format: date }
+        - in: query
+          name: page
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, default: 10 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponseBase'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          items:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/UserAnalyticsRow'
+                          total:
+                            type: integer
+                          page:
+                            type: integer
+                          pageSize:
+                            type: integer
+                        required: [items, total, page, pageSize]
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
