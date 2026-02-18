@@ -43,7 +43,7 @@ Run commands from `frontend/`.
 - By test name: `npx vitest run -t "should store and retrieve token"`
 
 ### Backend (Django)
-Run commands from `backend/`. The project uses a local virtualenv in `backend/venw/`.
+Run commands from `backend/`. The project uses a local virtualenv in `backend/venw/` (Windows absolute path: `d:\JavaCode\story\backend\venw`).
 
 - Activate venv (PowerShell): `./venw/Scripts/Activate.ps1`
 - Install deps: `pip install -r requirements.txt`

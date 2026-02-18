@@ -18,6 +18,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Backend (Django API)
 
+Windows 虚拟环境路径：d:\JavaCode\story\backend\venw
+
 ```bash
 # 1. 激活虚拟环境
 cd backend
