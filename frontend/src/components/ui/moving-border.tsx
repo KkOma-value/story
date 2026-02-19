@@ -6,7 +6,7 @@ import {
     useMotionValue,
     useTransform,
 } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface MovingBorderProps {
@@ -24,23 +24,67 @@ export function MovingBorder({
 }: MovingBorderProps) {
     const pathRef = useRef<SVGRectElement>(null);
     const progress = useMotionValue<number>(0);
+    // 用 ref 存储 length，避免 useTransform 闭包捕获旧的 state 值
+    const lengthRef = useRef<number>(0);
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+        const updateLength = () => {
+            if (!pathRef.current) return;
+            try {
+                const bbox = pathRef.current.getBBox();
+                if (bbox.width > 0 && bbox.height > 0) {
+                    const total = pathRef.current.getTotalLength();
+                    if (total > 0) {
+                        lengthRef.current = total;
+                        setReady(true);
+                    }
+                }
+            } catch {
+                // SVG 还未在 DOM 中布局，忽略
+            }
+        };
+
+        // 延迟一帧再测量，确保浏览器已完成布局
+        const raf = requestAnimationFrame(updateLength);
+
+        const observer = new ResizeObserver(updateLength);
+        const container = pathRef.current?.parentElement?.parentElement;
+        if (container) observer.observe(container);
+
+        return () => {
+            cancelAnimationFrame(raf);
+            observer.disconnect();
+        };
+    }, []);
 
     useAnimationFrame((time) => {
-        const length = pathRef.current?.getTotalLength();
-        if (length) {
-            const pxPerMillisecond = length / duration;
-            progress.set((time * pxPerMillisecond) % length);
+        const len = lengthRef.current;
+        if (len > 0) {
+            const pxPerMillisecond = len / duration;
+            progress.set((time * pxPerMillisecond) % len);
         }
     });
 
-    const x = useTransform(
-        progress,
-        (val) => pathRef.current?.getPointAtLength(val).x ?? 0
-    );
-    const y = useTransform(
-        progress,
-        (val) => pathRef.current?.getPointAtLength(val).y ?? 0
-    );
+    const x = useTransform(progress, (val) => {
+        const len = lengthRef.current;
+        if (!pathRef.current || len <= 0) return 0;
+        try {
+            return pathRef.current.getPointAtLength(val % len).x;
+        } catch {
+            return 0;
+        }
+    });
+
+    const y = useTransform(progress, (val) => {
+        const len = lengthRef.current;
+        if (!pathRef.current || len <= 0) return 0;
+        try {
+            return pathRef.current.getPointAtLength(val % len).y;
+        } catch {
+            return 0;
+        }
+    });
 
     const transform = useMotionTemplate`translateX(${x}px) translateY(${y}px) translateX(-50%) translateY(-50%)`;
 
@@ -50,8 +94,6 @@ export function MovingBorder({
                 xmlns="http://www.w3.org/2000/svg"
                 preserveAspectRatio="none"
                 className="absolute h-full w-full"
-                width="100%"
-                height="100%"
             >
                 <rect
                     fill="none"
@@ -62,17 +104,19 @@ export function MovingBorder({
                     ref={pathRef}
                 />
             </svg>
-            <motion.div
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    display: "inline-block",
-                    transform,
-                }}
-            >
-                <div className="h-2 w-2 rounded-full bg-accent shadow-glow-gold" />
-            </motion.div>
+            {ready && (
+                <motion.div
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        display: "inline-block",
+                        transform,
+                    }}
+                >
+                    <div className="h-2 w-2 rounded-full bg-accent shadow-glow-gold" />
+                </motion.div>
+            )}
             {children}
         </>
     );

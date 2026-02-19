@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Button, Input, List, message, Pagination } from 'antd';
+import { Avatar, Button, Input, message, Pagination } from 'antd';
 import { UserOutlined, DeleteOutlined } from '@ant-design/icons';
 import { api } from '../api';
 import { useAuth } from '../hooks/useAuth';
@@ -108,15 +108,13 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ novelId }) => {
             </div>
 
             {/* Comments List */}
-            <List
-                itemLayout="vertical"
-                dataSource={comments}
-                renderItem={(item) => (
-                    <List.Item className="!border-white/5">
-                        <List.Item.Meta
-                            avatar={<Avatar src={item.userAvatar} icon={<UserOutlined />} />}
-                            title={
-                                <div className="flex justify-between items-center">
+            <div className="space-y-6">
+                {comments.map((item) => (
+                    <div key={item.id} className="border-b border-white/5 pb-6">
+                        <div className="flex gap-4">
+                            <Avatar src={item.userAvatar} icon={<UserOutlined />} />
+                            <div className="flex-1">
+                                <div className="flex justify-between items-center mb-2">
                                     <div className="flex items-center gap-2">
                                         <span className="text-accent font-bold">{item.userDisplayName}</span>
                                         <span className="text-text-muted text-xs">{new Date(item.createdAt).toLocaleString()}</span>
@@ -125,70 +123,68 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ novelId }) => {
                                         <Button type="text" danger size="small" icon={<DeleteOutlined />} onClick={() => handleDelete(item.id)}>删除</Button>
                                     )}
                                 </div>
-                            }
-                            description={
-                                <div className={`text-text-secondary ${item.deleted ? 'italic opacity-50' : ''}`}>
+                                <div className={`text-text-secondary mb-3 ${item.deleted ? 'italic opacity-50' : ''}`}>
                                     {item.deleted ? '此评论已被删除' : item.content}
                                 </div>
-                            }
-                        />
 
-                        {/* Actions for Root Comment */}
-                        {!item.deleted && (
-                            <div className="ml-12 mb-4">
-                                <Button
-                                    type="link"
-                                    size="small"
-                                    className="text-text-muted hover:text-accent p-0"
-                                    onClick={() => setReplyTo(replyTo === item.id ? null : item.id)}
-                                >
-                                    {replyTo === item.id ? '取消回复' : '回复'}
-                                </Button>
-                            </div>
-                        )}
-
-                        {/* Reply Input */}
-                        {replyTo === item.id && (
-                            <div className="ml-12 mb-4 flex gap-2 animate-fade-in">
-                                <Input
-                                    value={replyContent}
-                                    onChange={e => setReplyContent(e.target.value)}
-                                    placeholder={`回复 @${item.userDisplayName}`}
-                                    className="!bg-black/20 !border-white/10 !text-text-secondary"
-                                />
-                                <Button type="primary" size="small" loading={submitting} onClick={() => handleSubmit(item.id)}>发送</Button>
-                            </div>
-                        )}
-
-                        {/* Replies */}
-                        {item.replies && item.replies.length > 0 && (
-                            <div className="ml-12 space-y-3 bg-white/5 p-4 rounded-sm border-l-2 border-accent/20">
-                                {item.replies.map(reply => (
-                                    <div key={reply.id} className="group relative">
-                                        <div className="flex justify-between items-center mb-1">
-                                            <span className="text-accent/80 text-sm font-bold">{reply.userDisplayName}</span>
-                                            <span className="text-text-muted text-xs">{new Date(reply.createdAt).toLocaleString()}</span>
-                                        </div>
-                                        <div className={`text-text-secondary text-sm ${reply.deleted ? 'italic opacity-50' : ''}`}>
-                                            {reply.deleted ? '此评论已被删除' : reply.content}
-                                        </div>
-                                        {user && reply.userId === user.id && !reply.deleted && (
-                                            <Button
-                                                type="text"
-                                                danger
-                                                size="small"
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => handleDelete(reply.id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 right-0 scale-75"
-                                            />
-                                        )}
+                                {/* Actions for Root Comment */}
+                                {!item.deleted && (
+                                    <div className="mb-4">
+                                        <Button
+                                            type="link"
+                                            size="small"
+                                            className="text-text-muted hover:text-accent p-0"
+                                            onClick={() => setReplyTo(replyTo === item.id ? null : item.id)}
+                                        >
+                                            {replyTo === item.id ? '取消回复' : '回复'}
+                                        </Button>
                                     </div>
-                                ))}
+                                )}
+
+                                {/* Reply Input */}
+                                {replyTo === item.id && (
+                                    <div className="mb-4 flex gap-2 animate-fade-in">
+                                        <Input
+                                            value={replyContent}
+                                            onChange={e => setReplyContent(e.target.value)}
+                                            placeholder={`回复 @${item.userDisplayName}`}
+                                            className="!bg-black/20 !border-white/10 !text-text-secondary"
+                                        />
+                                        <Button type="primary" size="small" loading={submitting} onClick={() => handleSubmit(item.id)}>发送</Button>
+                                    </div>
+                                )}
+
+                                {/* Replies */}
+                                {item.replies && item.replies.length > 0 && (
+                                    <div className="space-y-3 bg-white/5 p-4 rounded-sm border-l-2 border-accent/20">
+                                        {item.replies.map(reply => (
+                                            <div key={reply.id} className="group relative">
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="text-accent/80 text-sm font-bold">{reply.userDisplayName}</span>
+                                                    <span className="text-text-muted text-xs">{new Date(reply.createdAt).toLocaleString()}</span>
+                                                </div>
+                                                <div className={`text-text-secondary text-sm ${reply.deleted ? 'italic opacity-50' : ''}`}>
+                                                    {reply.deleted ? '此评论已被删除' : reply.content}
+                                                </div>
+                                                {user && reply.userId === user.id && !reply.deleted && (
+                                                    <Button
+                                                        type="text"
+                                                        danger
+                                                        size="small"
+                                                        icon={<DeleteOutlined />}
+                                                        onClick={() => handleDelete(reply.id)}
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 right-0 scale-75"
+                                                    />
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </List.Item>
-                )}
-            />
+                        </div>
+                    </div>
+                ))}
+            </div>
 
             {/* Pagination */}
             {total > 10 && (

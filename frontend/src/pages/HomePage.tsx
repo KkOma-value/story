@@ -158,10 +158,16 @@ export const HomePage: React.FC = () => {
   const [loading, setLoading] = useState({ personalized: true, hot: true, latest: true });
 
   useEffect(() => {
-    // 模拟数据加载
+    // 加载推荐数据
+    // 个性化推荐需要登录，失败时静默降级为热门推荐
     api.getRecommendations({ type: 'personalized', limit: 5 })
       .then((data) => setPersonalized(data))
-      .catch(() => console.error('加载个性化推荐失败'))
+      .catch(() => {
+        // 未登录或失败时，使用热门推荐作为降级
+        api.getRecommendations({ type: 'hot', limit: 5 })
+          .then((data) => setPersonalized(data))
+          .catch(() => setPersonalized([]));
+      })
       .finally(() => setLoading((l) => ({ ...l, personalized: false })));
 
     api.getRecommendations({ type: 'hot', limit: 5 })

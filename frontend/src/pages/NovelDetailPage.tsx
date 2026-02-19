@@ -301,6 +301,10 @@ export const NovelDetailPage: React.FC = () => {
         placement="right"
         onClose={() => setDrawerOpen(false)}
         open={drawerOpen}
+        styles={{
+          body: { padding: 0, backgroundColor: '#0a0a0f' },
+          header: { backgroundColor: '#0a0a0f', borderBottom: '1px solid rgba(255,255,255,0.1)' }
+        }}
         width={window.innerWidth > 768 ? 480 : '100%'}
         classNames={{
           header: '!bg-dark-paper !border-white/5',
