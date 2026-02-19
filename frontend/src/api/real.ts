@@ -1,4 +1,3 @@
-
 import type { ApiClient } from './interface';
 import type {
   ApiResponse,
@@ -100,6 +99,8 @@ export const realApi: ApiClient = {
     const res = await http.get<ApiResponse<PaginatedList<Novel>>>('/api/novels/search', {
       params: {
         q: req.keyword,
+        title: req.title,
+        author: req.author,
         category: req.category,
         tag: req.tag,
         page: req.page,
@@ -126,12 +127,22 @@ export const realApi: ApiClient = {
   },
 
   async getRecommendations(req: RecommendationRequest): Promise<Novel[]> {
-    const endpoint =
-      req.type === 'personalized'
-        ? '/api/recommendations/personalized'
-        : req.type === 'hot'
-          ? '/api/recommendations/hot'
-          : '/api/recommendations/latest';
+    const endpointMap: Record<string, string> = {
+      personalized: '/api/recommendations/personalized',
+      hot: '/api/recommendations/hot',
+      latest: '/api/recommendations/latest',
+    };
+
+    let endpoint: string;
+
+    if (req.type === 'related') {
+      if (!req.novelId) {
+        throw new Error('相似推荐需要提供 novelId 参数');
+      }
+      endpoint = `/api/recommendations/similar/${req.novelId}`;
+    } else {
+      endpoint = endpointMap[req.type] || '/api/recommendations/latest';
+    }
 
     const res = await http.get<ApiResponse<Novel[]>>(endpoint, {
       params: { limit: req.limit },

@@ -188,72 +188,36 @@ export const mockApi: ApiClient = {
 
   async login(req: LoginRequest): Promise<LoginResponse> {
     await delay(500);
-    // Accept any non-empty credentials; role determined by credential containing 'admin'
+
     if (!req.credential || !req.password) {
       throw new Error('账号/邮箱或密码不能为空');
     }
 
-    // Support simulated username and email login
-    interface UserResponse {
-      id: string;
-      username: string;
-      displayName: string;
-      email: string;
-      role: 'admin' | 'user';
-      avatarUrl: string | null;
-      bio: string | null;
-      joinedAt: string;
-      updatedAt: string;
-      status: string;
-    }
-
-    let user: UserResponse | null = null;
-
-    // Check for admin account
-    if (req.credential === 'admin' || req.credential === 'admin@test.com') {
-      if (req.password === 'admin123') {
-        user = {
+    // Admin account
+    if ((req.credential === 'admin' || req.credential === 'admin@test.com') && req.password === 'admin123') {
+      return {
+        token: 'mock-token-' + Date.now(),
+        user: {
           id: 'admin-uuid',
           username: '管理员',
-          displayName: '系统管理员',
-          email: 'admin@test.com',
           role: 'admin',
-          avatarUrl: null,
-          bio: null,
-          status: 'active',
-          joinedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-      }
-    } else if (req.password === '123456' || req.password === 'test') {
-      user = {
-        id: 'user-uuid',
-        username: '测试用户',
-        displayName: '普通用户',
-        email: 'user@test.com',
-        role: 'user',
-        avatarUrl: null,
-        bio: null,
-        status: 'active',
-        joinedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        }
       };
     }
 
-    if (!user) {
-      throw new Error('账号或密码错误');
+    // Test user accounts
+    if (req.password === '123456' || req.password === 'test') {
+      return {
+        token: 'mock-token-' + Date.now(),
+        user: {
+          id: 'user-uuid',
+          username: '测试用户',
+          role: 'user',
+        }
+      };
     }
 
-    const token = 'mock-token-' + Date.now();
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role as 'user' | 'admin',
-      }
-    };
+    throw new Error('账号或密码错误');
   },
 
   async register(req: RegisterRequest): Promise<RegisterResponse> {
@@ -301,14 +265,34 @@ export const mockApi: ApiClient = {
   async searchNovels(req: SearchRequest): Promise<PaginatedList<Novel>> {
     await delay(300);
     const kw = (req.keyword || '').toLowerCase();
-    let filtered = mockNovels.filter(
-      (n) =>
-        (!kw || n.title.toLowerCase().includes(kw) ||
-          n.author.toLowerCase().includes(kw) ||
-          n.tags.some((t) => t.toLowerCase().includes(kw))) &&
-        (!req.category || n.category === req.category) &&
-        (!req.status || n.status === req.status)
-    );
+    const title = (req.title || '').toLowerCase();
+    const author = (req.author || '').toLowerCase();
+    const tag = (req.tag || '').toLowerCase();
+
+    let filtered = mockNovels.filter((n) => {
+      // 通用关键词搜索
+      const matchesKeyword =
+        !kw ||
+        n.title.toLowerCase().includes(kw) ||
+        n.author.toLowerCase().includes(kw) ||
+        n.tags.some((t) => t.toLowerCase().includes(kw));
+
+      // 特定字段搜索
+      const matchesTitle = !title || n.title.toLowerCase().includes(title);
+      const matchesAuthor = !author || n.author.toLowerCase().includes(author);
+      const matchesTag = !tag || n.tags.some((t) => t.toLowerCase().includes(tag));
+      const matchesCategory = !req.category || n.category === req.category;
+      const matchesStatus = !req.status || n.status === req.status;
+
+      return (
+        matchesKeyword &&
+        matchesTitle &&
+        matchesAuthor &&
+        matchesTag &&
+        matchesCategory &&
+        matchesStatus
+      );
+    });
 
     // Sort
     switch (req.sort) {
@@ -331,13 +315,11 @@ export const mockApi: ApiClient = {
     const pageSize = req.pageSize ?? req.limit ?? 10;
     const start = (page - 1) * pageSize;
     return {
-      results: filtered.slice(start, start + pageSize),
-      count: filtered.length,
       items: filtered.slice(start, start + pageSize),
       total: filtered.length,
       page,
       pageSize,
-    } as PaginatedList<Novel> & { results: Novel[]; count: number };
+    };
   },
 
   async getNovelById(id: string): Promise<Novel> {

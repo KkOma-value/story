@@ -28,20 +28,22 @@ export const NovelDetailPage: React.FC = () => {
   const [myRating, setMyRating] = useState(0);
 
   const handleStartReading = async () => {
-    if (!novel?.sourceUrl) {
-      message.warning('暂无可用链接');
+    if (chapters.length === 0) {
+      message.warning('暂无章节');
       return;
     }
 
+    const firstChapterId = chapters[0].id;
+
     if (user) {
       try {
-        await api.createReadHistory(String(novel.id));
+        await api.createReadHistory(String(novel!.id));
       } catch {
         // Ignore history errors
       }
     }
 
-    window.open(novel.sourceUrl, '_blank', 'noopener');
+    navigate(`/read/${novel!.id}/${firstChapterId}`);
   };
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export const NovelDetailPage: React.FC = () => {
       Promise.all([
         api.getNovelById(id),
         api.getNovelChapters(id),
-        api.getRecommendations({ type: 'related', limit: 4 })
+        api.getRecommendations({ type: 'related', novelId: id, limit: 4 })
       ]).then(([novelData, chaptersData, relatedData]) => {
         setNovel(novelData);
         setChapters(chaptersData);
@@ -67,39 +69,42 @@ export const NovelDetailPage: React.FC = () => {
     }
   }, [id]);
 
-  const toggleShelf = () => {
+  const toggleShelf = async () => {
     if (!user) {
       message.warning('请先入阁 (登录)');
-      return navigate('/login');
+      navigate('/login');
+      return;
     }
-    if (isInShelf) {
-      api.removeFromBookshelf(novel!.id).then(() => {
+
+    try {
+      if (isInShelf) {
+        await api.removeFromBookshelf(novel!.id);
         setIsInShelf(false);
         message.success('已移出藏经阁');
-      }).catch(() => {
-        message.error('操作失败');
-      });
-    } else {
-      api.addToBookshelf(novel!.id).then(() => {
+      } else {
+        await api.addToBookshelf(novel!.id);
         setIsInShelf(true);
         message.success('已收入藏经阁');
-      }).catch(() => {
-        message.error('操作失败');
-      });
+      }
+    } catch {
+      message.error('操作失败');
     }
   };
 
-  const handleRate = (value: number) => {
+  const handleRate = async (value: number) => {
     if (!user) {
       message.warning('请先入阁 (登录)');
-      return navigate('/login');
+      navigate('/login');
+      return;
     }
-    api.rateNovel(String(novel!.id), value).then(() => {
+
+    try {
+      await api.rateNovel(String(novel!.id), value);
       setMyRating(value);
       message.success('评分成功');
-    }).catch(() => {
+    } catch {
       message.error('评分失败');
-    });
+    }
   };
 
   if (loading) {

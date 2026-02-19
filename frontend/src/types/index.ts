@@ -1,27 +1,19 @@
-// ============================================================
-// Domain types - shared across the application
-// ============================================================
-
-/** User role */
 export type UserRole = 'user' | 'admin';
 
-/** User status */
 export type UserStatus = 'active' | 'banned' | 'permanent_banned' | 'deleted';
 
-/** Authenticated user info (returned after login) */
 export interface User {
   id: string;
   username: string;
   role: UserRole;
   avatar?: string;
-  avatarUrl?: string; // API uses avatarUrl, map to this
+  avatarUrl?: string;
   displayName?: string;
   bio?: string;
   email?: string;
   status?: UserStatus;
 }
 
-/** Novel entity */
 export interface Novel {
   id: string;
   title: string;
@@ -31,18 +23,14 @@ export interface Novel {
   intro: string;
   coverUrl?: string;
   sourceUrl?: string;
-  /** Novel status */
   status?: 'ongoing' | 'completed';
-  /** ISO date string */
   updatedAt: string;
-  /** Popularity metrics */
   views: number;
   favorites: number;
   rating: number;
   wordCount: number;
 }
 
-/** Chapter entity */
 export interface Chapter {
   id: number;
   novelId: number;
@@ -53,7 +41,6 @@ export interface Chapter {
   updatedAt: string;
 }
 
-/** Paginated list wrapper */
 export interface PaginatedList<T> {
   items: T[];
   total: number;
@@ -61,16 +48,11 @@ export interface PaginatedList<T> {
   pageSize: number;
 }
 
-/** Unified API response envelope */
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T | null;
 }
-
-// ============================================================
-// API request / response DTOs
-// ============================================================
 
 export interface LoginRequest {
   credential: string;
@@ -84,10 +66,8 @@ export interface LoginResponse {
 
 export interface RegisterRequest {
   username: string;
-  /** user-provided display name */
   displayName: string;
   email: string;
-  /** email verification code */
   code: string;
   password: string;
   confirmPassword: string;
@@ -99,6 +79,8 @@ export interface RegisterResponse {
 
 export interface SearchRequest {
   keyword?: string;
+  title?: string;
+  author?: string;
   category?: string;
   status?: string;
   sort?: string;
@@ -111,9 +93,9 @@ export interface SearchRequest {
 export interface RecommendationRequest {
   type: 'personalized' | 'hot' | 'latest' | 'new' | 'completed' | 'rating' | 'monthly' | 'reward' | 'related';
   limit?: number;
+  novelId?: string;
 }
 
-/** Read History */
 export interface ReadHistory {
   id: string;
   novel: Novel;
