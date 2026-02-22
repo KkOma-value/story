@@ -117,7 +117,8 @@ export const InfiniteMovingCards = ({
                     </li>
                 ))}
             </ul>
-            <style jsx>{`
+            <style dangerouslySetInnerHTML={{
+                __html: `
         @keyframes scroll {
           to {
             transform: translate(calc(-50% - 0.5rem));
@@ -127,7 +128,7 @@ export const InfiniteMovingCards = ({
           animation: scroll var(--animation-duration) linear infinite
             var(--animation-direction);
         }
-      `}</style>
+      `}} />
         </div>
     );
 };

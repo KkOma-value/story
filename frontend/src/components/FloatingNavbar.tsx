@@ -1,56 +1,16 @@
 import React from 'react';
-import { FloatingNav } from './ui/floating-navbar';
-import { PlaceholdersAndVanishInput } from './ui/placeholders-and-vanish-input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const navItems = [
-    {
-        name: '首页',
-        link: '/',
-        icon: (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-        ),
-    },
-    {
-        name: '书架',
-        link: '/bookshelf',
-        icon: (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-        ),
-    },
-    {
-        name: '排行榜',
-        link: '/ranking',
-        icon: (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
-        ),
-    },
-    {
-        name: '分类',
-        link: '/category',
-        icon: (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-        ),
-    },
-];
-
-const searchPlaceholders = [
-    '搜索仙侠小说...',
-    '搜索玄幻作品...',
-    '搜索修真传奇...',
-    '搜索武侠经典...',
+    { name: '首页', link: '/' },
+    { name: '书架', link: '/bookshelf' },
+    { name: '排行榜', link: '/ranking' },
+    { name: '分类', link: '/category' },
 ];
 
 export const FloatingNavbar: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchValue, setSearchValue] = React.useState('');
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,15 +25,57 @@ export const FloatingNavbar: React.FC = () => {
     };
 
     return (
-        <>
-            <FloatingNav navItems={navItems} />
-            <div className="fixed top-24 inset-x-0 z-[4999] px-4">
-                <PlaceholdersAndVanishInput
-                    placeholders={searchPlaceholders}
-                    onChange={handleSearchChange}
-                    onSubmit={handleSearchSubmit}
-                />
+        <nav className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center py-6 px-8 relative z-50 mt-4 bg-white/60 backdrop-blur-md rounded-[32px] border-2 border-organic-ink/10 shadow-sm">
+            {/* Logo */}
+            <div
+                className="text-3xl font-display text-organic-aqua flex items-center gap-2 cursor-pointer mb-4 md:mb-0 hover:scale-105 transition-transform"
+                onClick={() => navigate('/')}
+            >
+                <div className="w-10 h-10 bg-organic-aqua rounded-blob flex items-center justify-center text-white text-lg shadow-sm border-2 border-organic-ink/10 animate-blob-bounce" style={{ animationDuration: '8s' }}>
+                    📖
+                </div>
+                玄幻阁
             </div>
-        </>
+
+            {/* Links & Search */}
+            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 w-full md:w-auto">
+                {/* Navigation Links */}
+                <div className="flex space-x-6 font-body font-bold text-organic-ink/70">
+                    {navItems.map((item) => (
+                        <button
+                            key={item.name}
+                            onClick={() => navigate(item.link)}
+                            className={`hover:text-organic-aqua transition-colors px-3 py-1 rounded-full ${location.pathname === item.link ? 'bg-organic-aqua/10 text-organic-aqua' : ''}`}
+                        >
+                            {item.name}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Search Bar */}
+                <form onSubmit={handleSearchSubmit} className="relative w-full md:w-64">
+                    <input
+                        type="text"
+                        value={searchValue}
+                        onChange={handleSearchChange}
+                        placeholder="在此搜索修真世界..."
+                        className="w-full bg-organic-wood/50 border-2 border-organic-ink/10 rounded-full py-2.5 px-5 text-sm font-body font-bold text-organic-ink placeholder:text-organic-ink/40 focus:outline-none focus:border-organic-aqua focus:bg-white transition-all shadow-inner"
+                    />
+                    <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-organic-ink/50 hover:text-organic-aqua transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
+                </form>
+
+                {/* Avatar / Profile */}
+                <div
+                    onClick={() => navigate('/profile')}
+                    className="w-11 h-11 bg-organic-sand rounded-full border-2 border-organic-ink/20 flex items-center justify-center cursor-pointer hover:bg-organic-aqua hover:text-white transition-colors shadow-sm ml-2 hidden md:flex"
+                >
+                    👤
+                </div>
+            </div>
+        </nav>
     );
 };

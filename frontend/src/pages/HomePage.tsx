@@ -56,22 +56,22 @@ const Section: React.FC<SectionProps> = ({ title, subTitle, icon, iconColor, nov
       {/* 标题栏 */}
       <div className="flex items-end justify-between mb-6 pb-2 border-b border-dark-border relative z-10">
         <div className="flex items-center gap-3">
-          <div className={`p-1.5 rounded-sm bg-dark-paper border border-dark-border ${colorClasses[iconColor]}`}>
+          <div className={`p-2 rounded-2xl bg-white border-2 border-organic-ink/10 shadow-sm ${colorClasses[iconColor]}`}>
             {icon}
           </div>
           <div>
-            <h2 className="font-display text-2xl font-bold text-text-primary tracking-wide">{title}</h2>
+            <h2 className="font-display text-3xl font-bold text-organic-ink tracking-wider">{title}</h2>
             {subTitle && (
-              <p className="text-xs text-text-muted mt-0.5 font-body tracking-wider">{subTitle}</p>
+              <p className="text-sm text-organic-ink/50 mt-1 font-body font-bold tracking-wider">{subTitle}</p>
             )}
           </div>
         </div>
         {moreLink && (
           <button
             onClick={() => navigate(moreLink)}
-            className="flex items-center gap-1 text-text-secondary hover:text-accent transition-all duration-300 group px-3 py-1"
+            className="flex items-center gap-1 text-organic-ink/60 hover:text-organic-aqua transition-all duration-300 group px-4 py-2 bg-white border-2 border-organic-ink/10 rounded-full hover:shadow-[2px_2px_0px_#678983] hover:-translate-y-0.5"
           >
-            <span className="text-xs font-medium tracking-wide">查看更多</span>
+            <span className="text-sm font-bold tracking-wide">查看更多</span>
             <span className="transform group-hover:translate-x-0.5 transition-transform">
               <ChevronRightIcon />
             </span>
@@ -85,8 +85,8 @@ const Section: React.FC<SectionProps> = ({ title, subTitle, icon, iconColor, nov
           <Spin size="large" />
         </div>
       ) : novels.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-text-muted bg-dark-paper/50 rounded-sm border border-dashed border-dark-border">
-          <p className="font-body text-sm">暂无记述</p>
+        <div className="flex flex-col items-center justify-center py-20 text-organic-ink/50 bg-white/50 rounded-2xl border-2 border-dashed border-organic-ink/10">
+          <p className="font-body text-sm font-bold">暂无记述</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
@@ -130,17 +130,17 @@ const CategoryQuickLinks: React.FC = () => {
             key={cat.name}
             onClick={() => navigate(`/category?cat=${cat.id}`)}
             className={`
-              group relative flex flex-col items-center gap-2 p-4 rounded-sm border border-dark-border bg-dark-paper
+              group relative flex flex-col items-center gap-2 p-5 rounded-3xl border-2 border-organic-ink/10 bg-white shadow-[4px_4px_0px_#E6DDC4]
               transition-all duration-300 cursor-pointer overflow-hidden
-              hover:border-accent/40 hover:bg-dark-hover hover:-translate-y-0.5
+              hover:border-organic-aqua hover:shadow-[4px_4px_0px_#678983] hover:-translate-y-1 hover:-translate-x-1
             `}
           >
-            <span className="relative z-10 text-2xl mb-1 transform group-hover:scale-110 transition-transform duration-300 filter grayscale group-hover:grayscale-0">
+            <span className="relative z-10 text-3xl mb-2 transform group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-300 filter grayscale group-hover:grayscale-0">
               {cat.icon}
             </span>
             <div className="relative z-10 text-center">
-              <h3 className="font-body font-bold text-sm text-text-primary tracking-wide">{cat.name}</h3>
-              <p className="text-[10px] text-text-muted mt-0.5 tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
+              <h3 className="font-body font-bold text-base text-organic-ink tracking-wide">{cat.name}</h3>
+              <p className="text-xs text-organic-ink/50 mt-1 font-bold tracking-wider opacity-80 group-hover:opacity-100 transition-opacity">
                 {cat.desc}
               </p>
             </div>
@@ -182,9 +182,9 @@ export const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-[1400px] mx-auto pt-6">
       <Hero />
-      <div className="relative z-10 -mt-6 mb-12 px-4">
+      <div className="relative z-10 -mt-10 mb-16 px-4">
         <CategoryQuickLinks />
       </div>
 

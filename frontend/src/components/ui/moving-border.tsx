@@ -6,7 +6,7 @@ import {
     useMotionValue,
     useTransform,
 } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface MovingBorderProps {
@@ -24,7 +24,6 @@ export function MovingBorder({
 }: MovingBorderProps) {
     const pathRef = useRef<SVGRectElement>(null);
     const progress = useMotionValue<number>(0);
-    // 用 ref 存储 length，避免 useTransform 闭包捕获旧的 state 值
     const lengthRef = useRef<number>(0);
     const [ready, setReady] = useState(false);
 
@@ -41,11 +40,10 @@ export function MovingBorder({
                     }
                 }
             } catch {
-                // SVG 还未在 DOM 中布局，忽略
+                // SVG not yet laid out
             }
         };
 
-        // 延迟一帧再测量，确保浏览器已完成布局
         const raf = requestAnimationFrame(updateLength);
 
         const observer = new ResizeObserver(updateLength);
@@ -142,17 +140,8 @@ export function Button({
     className,
     ...otherProps
 }: ButtonProps) {
-    return (
-        <Component
-            className={cn(
-                "bg-transparent relative text-xl h-12 w-40 p-[1px] overflow-hidden",
-                containerClassName
-            )}
-            style={{
-                borderRadius: borderRadius,
-            }}
-            {...otherProps}
-        >
+    const content = (
+        <>
             <div
                 className="absolute inset-0"
                 style={{ borderRadius: `calc(${borderRadius} * 0.96)` }}
@@ -178,6 +167,21 @@ export function Button({
             >
                 {children}
             </div>
-        </Component>
+        </>
+    );
+
+    return React.createElement(
+        Component,
+        {
+            className: cn(
+                "bg-transparent relative text-xl h-12 w-40 p-[1px] overflow-hidden",
+                containerClassName
+            ),
+            style: {
+                borderRadius: borderRadius,
+            },
+            ...otherProps,
+        },
+        content
     );
 }

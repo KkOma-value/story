@@ -1,85 +1,62 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BackgroundBeams } from './ui/background-beams';
-import { Spotlight } from './ui/spotlight';
-import { TextGenerateEffect } from './ui/text-generate-effect';
-import { Button as MovingBorderButton } from './ui/moving-border';
-
-// Ink Icons
-const FireIcon = () => (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z" />
-    </svg>
-);
-
-const StarIcon = () => (
-    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-    </svg>
-);
 
 export const Hero: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="relative mb-20 rounded-lg overflow-hidden border border-dark-border shadow-elevation-2 group min-h-[500px] flex items-center bg-dark-paper">
-            {/* Background Layer with Aceternity UI Effects */}
-            <div className="absolute inset-0 bg-dark z-0">
-                {/* Spotlight Effect */}
-                <Spotlight
-                    className="-top-40 left-0 md:left-60 md:-top-20"
-                    fill="#D4AF37"
-                />
+        <main className="relative w-full min-h-[500px] md:min-h-[60vh] flex items-center px-6 md:px-12 lg:px-24 rounded-[40px] bg-organic-wood overflow-hidden border-2 border-organic-ink/10 shadow-sm mt-6">
+            {/* Organic background shapes */}
+            <div className="absolute right-0 top-0 w-full md:w-1/2 h-full flex items-center justify-center pointer-events-none z-0 opacity-20 md:opacity-100">
+                <div className="w-[80vw] md:w-[30vw] h-[80vw] md:h-[30vw] bg-organic-aqua/20 absolute rounded-blob animate-blob-bounce blur-2xl"></div>
+                <div className="w-[70vw] md:w-[25vw] h-[70vw] md:h-[25vw] bg-organic-sand absolute rounded-blob2 animate-blob-bounce translate-x-12 translate-y-12 shadow-2xl mix-blend-multiply border-4 border-organic-ink/5 border-dashed" style={{ animationDuration: '15s', animationDirection: 'alternate-reverse' }}></div>
 
-                {/* Background Beams */}
-                <BackgroundBeams />
-
-                {/* Gradient Overlay for Text Readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent pointer-events-none" />
-            </div>
-
-            {/* Content Layer */}
-            <div className="relative z-10 px-8 py-16 md:px-16 md:py-24 max-w-7xl mx-auto w-full h-full flex flex-col justify-center pointer-events-none">
-                <div className="max-w-3xl pointer-events-auto">
-                    {/* Title with Text Generate Effect */}
-                    <TextGenerateEffect
-                        words="天地玄黄 宇宙洪荒"
-                        className="font-display text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-wider drop-shadow-lg"
-                    />
-
-                    <p className="text-text-secondary text-lg md:text-xl mb-10 leading-relaxed font-body max-w-xl border-l-2 border-accent pl-6">
-                        "书中自有黄金屋，书中自有颜如玉。<br />
-                        入我玄幻阁，修万世不朽之法。"
-                    </p>
-
-                    <div className="flex flex-wrap gap-4">
-                        {/* Moving Border Button */}
-                        <MovingBorderButton
-                            borderRadius="1px"
-                            className="bg-action hover:bg-action-hover text-white font-body font-medium tracking-wide px-8"
-                            containerClassName="h-12"
-                            duration={3000}
-                            onClick={() => navigate('/category')}
-                        >
-                            <span className="flex items-center gap-2 whitespace-nowrap">
-                                <FireIcon />
-                                <span className="whitespace-nowrap">开启修炼</span>
-                            </span>
-                        </MovingBorderButton>
-
-                        {/* Outline Button */}
-                        <button
-                            onClick={() => navigate('/ranking')}
-                            className="app-button-outline h-12 text-base px-8 backdrop-blur-sm bg-black/20"
-                        >
-                            <div className="flex items-center gap-2">
-                                <StarIcon />
-                                <span>观摩天榜</span>
-                            </div>
-                        </button>
+                {/* Floating books/cards simulation (hidden on small screens) */}
+                <div className="hidden md:flex absolute z-10 w-48 h-64 bg-white rounded-2xl shadow-[10px_10px_0px_#678983] border-2 border-organic-ink transform -rotate-12 -translate-x-24 hover:-translate-y-4 hover:rotate-0 transition-all duration-500 flex-col items-center justify-center p-4">
+                    <div className="w-full h-32 bg-organic-sand rounded-xl mb-4"></div>
+                    <div className="w-3/4 h-4 bg-gray-200 rounded-full mb-2"></div>
+                    <div className="w-1/2 h-4 bg-gray-200 rounded-full"></div>
+                </div>
+                <div className="hidden md:flex absolute z-20 w-56 h-72 bg-white rounded-2xl shadow-[10px_10px_0px_#181D31] border-2 border-organic-ink transform rotate-6 translate-x-12 translate-y-24 hover:-translate-y-4 hover:rotate-0 transition-all duration-500 overflow-hidden">
+                    <div className="w-full h-full bg-organic-aqua p-6 flex flex-col justify-end text-white">
+                        <h3 className="font-display text-2xl mb-1">仙道长青</h3>
+                        <p className="font-body text-sm opacity-90 font-bold">9.8 评分</p>
                     </div>
                 </div>
             </div>
-        </div>
+
+            {/* Content */}
+            <div className="relative z-10 max-w-2xl">
+                <div className="inline-block px-4 py-2 bg-organic-sand rounded-full text-organic-ink font-bold font-body mb-6 border-2 border-organic-ink transform -rotate-2">
+                    ✨ 全新沉浸式阅读体验
+                </div>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-display leading-[1.1] text-organic-ink mb-6 drop-shadow-sm">
+                    让阅读成为<br />
+                    最自然的<span className="text-organic-aqua relative inline-block ml-2">
+                        享受
+                        <svg className="absolute w-full h-3 -bottom-1 left-0 text-organic-sand" viewBox="0 0 100 20" preserveAspectRatio="none">
+                            <path d="M0 10 Q 50 20 100 0" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                        </svg>
+                    </span>
+                </h1>
+                <p className="text-lg md:text-xl font-body text-organic-ink/80 mb-10 font-bold leading-relaxed max-w-lg">
+                    在繁杂的世界中，寻找一片宁静的修仙之地。护眼模式、极简排版，只为最纯粹的阅读。
+                </p>
+                <div className="flex flex-wrap gap-4">
+                    <button
+                        onClick={() => navigate('/category')}
+                        className="px-8 py-4 bg-organic-aqua text-white rounded-2xl font-body font-bold tracking-wider hover:bg-organic-ink transition-colors shadow-[4px_4px_0px_#181D31] hover:shadow-[2px_2px_0px_#181D31] hover:translate-y-[2px] hover:translate-x-[2px] border-2 border-transparent"
+                    >
+                        随便逛逛
+                    </button>
+                    <button
+                        onClick={() => navigate('/ranking')}
+                        className="px-8 py-4 bg-white text-organic-ink border-2 border-organic-ink rounded-2xl font-body font-bold tracking-wider hover:bg-organic-sand transition-colors shadow-[4px_4px_0px_#181D31] hover:shadow-[2px_2px_0px_#181D31] hover:translate-y-[2px] hover:translate-x-[2px]"
+                    >
+                        观摩天榜
+                    </button>
+                </div>
+            </div>
+        </main>
     );
 };

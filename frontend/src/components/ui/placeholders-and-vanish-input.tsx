@@ -19,7 +19,7 @@ export function PlaceholdersAndVanishInput({
     const [value, setValue] = useState("");
     const [animating, setAnimating] = useState(false);
 
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const startAnimation = () => {
         intervalRef.current = setInterval(() => {

@@ -105,7 +105,7 @@ export const FadeInDiv = ({
 export type Tab = {
     title: string;
     value: string;
-    content?: string | React.ReactNode | unknown;
+    content?: string | React.ReactNode | any;
 };
 
 import { useState } from "react";

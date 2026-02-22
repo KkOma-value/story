@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export function HoverBorderGradient({
@@ -18,22 +17,15 @@ export function HoverBorderGradient({
         className?: string;
         duration?: number;
         clockwise?: boolean;
-    } & React.HTMLAttributes<HTMLElement>
+    } & React.HTMLAttributes<HTMLElement> & React.ButtonHTMLAttributes<HTMLButtonElement>
 >) {
-    return (
-        <Tag
-            className={cn(
-                "relative flex rounded-md p-[1px] overflow-hidden bg-dark-paper",
-                containerClassName
-            )}
-            {...props}
-        >
+    const content = (
+        <>
             <div
                 className="absolute inset-0 z-[1] rounded-md"
                 style={{
                     background: `conic-gradient(from ${clockwise ? "0deg" : "360deg"} at 50% 50%, transparent 0%, #D4AF37 50%, transparent 100%)`,
-                    animation: `spin ${duration}s linear infinite ${clockwise ? "" : "reverse"
-                        }`,
+                    animation: `hbg-spin ${duration}s linear infinite ${clockwise ? "" : "reverse"}`,
                 }}
             />
             <div
@@ -44,16 +36,25 @@ export function HoverBorderGradient({
             >
                 {children}
             </div>
-            <style jsx>{`
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+            <style dangerouslySetInnerHTML={{
+                __html: `
+        @keyframes hbg-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
-      `}</style>
-        </Tag>
+      `}} />
+        </>
+    );
+
+    return React.createElement(
+        Tag,
+        {
+            className: cn(
+                "relative flex rounded-md p-[1px] overflow-hidden bg-dark-paper",
+                containerClassName
+            ),
+            ...props,
+        },
+        content
     );
 }

@@ -8,21 +8,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 黑金书阁主题 (Black-Gold Library)
+        // Organic & Relaxed Theme (Playground V2)
+        organic: {
+          sand: '#E6DDC4',
+          aqua: '#678983',
+          wood: '#F0E9D2',
+          ink: '#181D31',
+        },
+        // Legacy colors (kept for compatibility)
         primary: {
-          DEFAULT: '#D4AF37', // 香槟金 (主品牌)
-          light: '#F4D03F',
-          dark: '#B7950B',
+          DEFAULT: '#678983', // Shifted to aqua
+          light: '#A0BCC2',
+          dark: '#4C6A65',
         },
         accent: {
-          DEFAULT: '#D4AF37', // 金 (高亮)
-          highlight: '#F1C40F',
-          dim: 'rgba(212, 175, 55, 0.1)',
+          DEFAULT: '#E6DDC4', // Shifted to sand
+          highlight: '#F0E9D2',
+          dim: 'rgba(230, 221, 196, 0.2)',
         },
         action: {
-          DEFAULT: '#C0392B', // 丹砂红 (行动/热点)
-          hover: '#E74C3C',
-          glow: 'rgba(192, 57, 43, 0.4)',
+          DEFAULT: '#678983',
+          hover: '#181D31',
+          glow: 'rgba(103, 137, 131, 0.4)',
         },
         // 境界色
         rank: {
@@ -30,27 +37,26 @@ export default {
           silver: '#C0C0C0', // 银榜
           bronze: '#CD7F32', // 铜榜
         },
-        // 背景色系 - 极简黑
+        // 背景色系 - 自然木色/沙色
         dark: {
-          DEFAULT: '#0A0A0A', // 纯黑/深碳
-          paper: '#141414',   // 卡片背景
-          hover: '#1F1F1F',   // 悬停反馈
-          border: '#262626',  // 分割线
-          overlay: 'rgba(0, 0, 0, 0.85)',
+          DEFAULT: '#F0E9D2',
+          paper: '#FFFFFF',
+          hover: '#E6DDC4',
+          border: '#D1CBAE',
+          overlay: 'rgba(24, 29, 49, 0.5)', /* overlay with ink color */
         },
-        // 文字色系
+        // 文字色系 - 深墨色
         text: {
-          primary: '#EBEBEB', // 主文本 (高对比)
-          secondary: '#A3A3A3', // 次级文本
-          muted: '#525252',   // 弱化文本
-          gold: '#D4AF37',
+          primary: '#181D31',
+          secondary: 'rgba(24, 29, 49, 0.7)',
+          muted: 'rgba(24, 29, 49, 0.5)',
+          gold: '#678983', /* aqua */
         },
       },
       fontFamily: {
-        display: ['"Noto Serif SC"', 'serif'], // 标题 - 改用宋体，更显质感
-        body: ['"Inter"', '"Noto Sans SC"', 'sans-serif'], // 正文 - 易读黑体
+        display: ['"Ma Shan Zheng"', 'cursive'], // 自然薄笔书法风
+        body: ['"Nunito"', 'sans-serif'], // 可读性高的圆润无衬线
         mono: ['"JetBrains Mono"', 'monospace'],
-        // 书法字体仅用于 Logo 或极其特殊的印章
         calligraphy: ['"Ma Shan Zheng"', 'cursive'],
       },
       backgroundImage: {
@@ -68,11 +74,14 @@ export default {
       },
       borderRadius: {
         'none': '0',
-        'sm': '1px',  // 极简硬朗风格
-        'md': '2px',
-        'lg': '4px',
-        'xl': '8px',
+        'sm': '8px',  // 变成更圆润的风格
+        'md': '12px',
+        'lg': '16px',
+        'xl': '24px',
+        '2xl': '32px',
         'full': '9999px',
+        'blob': '40% 60% 70% 30% / 40% 50% 60% 50%',
+        'blob2': '60% 40% 30% 70% / 60% 30% 70% 40%',
       },
       animation: {
         'fade-in-up': 'fadeInUp 0.5s ease-out',
@@ -83,6 +92,7 @@ export default {
         'grid': 'grid 15s linear infinite',
         'aurora': 'aurora 60s linear infinite',
         'scroll': 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
+        'blob-bounce': 'blobBounce 10s infinite alternate ease-in-out',
       },
       keyframes: {
         fadeInUp: {
@@ -141,6 +151,10 @@ export default {
           to: {
             transform: 'translate(calc(-50% - 0.5rem))',
           },
+        },
+        blobBounce: {
+          '0%': { borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%', transform: 'translateY(0) rotate(0deg)' },
+          '100%': { borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%', transform: 'translateY(-20px) rotate(10deg)' },
         },
       },
     },
