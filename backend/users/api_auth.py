@@ -10,6 +10,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from analytics.models import LoginEvent
 from core.responses import api_error, api_ok
+from users.email_utils import send_verification_email
 from users.models import User, UserStatus
 from users.serializers import UserSerializer
 
@@ -29,8 +30,9 @@ def send_email_code(request):
     code = "".join(str(random.randint(0, 9)) for _ in range(6))
     cache.set(_email_code_cache_key(email, purpose), code, timeout=10 * 60)
 
-    # 开发期假发送：打印到控制台/日志
-    print(f"[DEV] email code for {email}: {code}")
+    # 发送验证码邮件
+    if not send_verification_email(email, code, "register"):
+        return api_error("邮件发送失败，请稍后重试", status=500)
 
     return api_ok({"sent": True})
 
@@ -121,8 +123,9 @@ def send_reset_code(request):
     code = "".join(str(random.randint(0, 9)) for _ in range(6))
     cache.set(_email_code_cache_key(email, "reset_password"), code, timeout=10 * 60)
 
-    # 开发期假发送：打印到控制台/日志
-    print(f"[DEV] reset password code for {email}: {code}")
+    # 发送密码重置验证码邮件
+    if not send_verification_email(email, code, "reset_password"):
+        return api_error("邮件发送失败，请稍后重试", status=500)
 
     return api_ok({"sent": True})
 
